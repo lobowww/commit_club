@@ -55,11 +55,11 @@
                             <select name="categoria" id="id_categoria" required
                                 class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all appearance-none cursor-pointer">
                                 <option value="" class="bg-brand-800">Selecione...</option>
-                                <option value="programacao" class="bg-brand-800" {% if form.categoria.value == 'programacao' %}selected{% endif %}>💻 Programação</option>
-                                <option value="design" class="bg-brand-800" {% if form.categoria.value == 'design' %}selected{% endif %}>🎨 Design</option>
-                                <option value="dados" class="bg-brand-800" {% if form.categoria.value == 'dados' %}selected{% endif %}>📊 Dados</option>
-                                <option value="devops" class="bg-brand-800" {% if form.categoria.value == 'devops' %}selected{% endif %}>⚙️ DevOps</option>
-                                <option value="estudo" class="bg-brand-800" {% if form.categoria.value == 'estudo' %}selected{% endif %}>📚 Estudo</option>
+                                <option value="PROGRAMACAO" class="bg-brand-800" {% if form.categoria.value == 'PROGRAMACAO' %}selected{% endif %}>💻 Programação</option>
+                                <option value="DESIGN" class="bg-brand-800" {% if form.categoria.value == 'DESIGN' %}selected{% endif %}>🎨 Design</option>
+                                <option value="DADOS" class="bg-brand-800" {% if form.categoria.value == 'DADOS' %}selected{% endif %}>📊 Dados</option>
+                                <option value="DEVOPS" class="bg-brand-800" {% if form.categoria.value == 'DEVOPS' %}selected{% endif %}>⚙️ DevOps</option>
+                                <option value="ESTUDO" class="bg-brand-800" {% if form.categoria.value == 'ESTUDO' %}selected{% endif %}>📚 Estudo</option>
                             </select>
                             {% if form.categoria.errors %}
                             <p class="text-red-400 text-xs mt-1">{{ form.categoria.errors.0 }}</p>
@@ -70,10 +70,10 @@
                             <select name="tipo" id="id_tipo" required
                                 class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all appearance-none cursor-pointer">
                                 <option value="" class="bg-brand-800">Selecione...</option>
-                                <option value="diario" class="bg-brand-800" {% if form.tipo.value == 'diario' %}selected{% endif %}>Diário</option>
-                                <option value="semanal" class="bg-brand-800" {% if form.tipo.value == 'semanal' %}selected{% endif %}>Semanal</option>
-                                <option value="mensal" class="bg-brand-800" {% if form.tipo.value == 'mensal' %}selected{% endif %}>Mensal</option>
-                                <option value="unico" class="bg-brand-800" {% if form.tipo.value == 'unico' %}selected{% endif %}>Único</option>
+                                <option value="DIARIO" class="bg-brand-800" {% if form.tipo.value == 'DIARIO' %}selected{% endif %}>Diário</option>
+                                <option value="SEMANAL" class="bg-brand-800" {% if form.tipo.value == 'SEMANAL' %}selected{% endif %}>Semanal</option>
+                                <option value="MENSAL" class="bg-brand-800" {% if form.tipo.value == 'MENSAL' %}selected{% endif %}>Mensal</option>
+                                <option value="CUSTOM" class="bg-brand-800" {% if form.tipo.value == 'CUSTOM' %}selected{% endif %}>Único</option>
                             </select>
                             {% if form.tipo.errors %}
                             <p class="text-red-400 text-xs mt-1">{{ form.tipo.errors.0 }}</p>
