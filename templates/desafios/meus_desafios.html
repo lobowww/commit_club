@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Meus Desafios{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 animate-fade-in">
+        <div>
+            <h1 class="text-3xl font-extrabold text-white flex items-center space-x-3">
+                <span>🎯</span>
+                <span>Meus Desafios</span>
+            </h1>
+            <p class="text-gray-400 mt-2">Acompanhe seu progresso e desafios criados</p>
+        </div>
+        <a href="{% url 'criar_desafio' %}" class="mt-4 sm:mt-0 px-6 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-[1.02] transition-all">
+            + Criar Desafio
+        </a>
+    </div>
+
+    <!-- ========== ACTIVE PARTICIPATIONS ========== -->
+    <div class="mb-10">
+        <h2 class="text-xl font-bold text-white mb-5 flex items-center space-x-2">
+            <span>🔥</span>
+            <span>Desafios Ativos</span>
+            {% if participacoes_ativas %}
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 ml-2">
+                {{ participacoes_ativas|length }}
+            </span>
+            {% endif %}
+        </h2>
+
+        {% if participacoes_ativas %}
+        <div class="space-y-4">
+            {% for p in participacoes_ativas %}
+            <div class="glass rounded-2xl p-5 sm:p-6 card-hover animate-slide-up" style="animation-delay: {{ forloop.counter0 }}00ms;">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider
+                                {% if p.desafio.categoria == 'programacao' %}bg-blue-500/15 text-blue-400
+                                {% elif p.desafio.categoria == 'design' %}bg-pink-500/15 text-pink-400
+                                {% elif p.desafio.categoria == 'dados' %}bg-purple-500/15 text-purple-400
+                                {% elif p.desafio.categoria == 'devops' %}bg-orange-500/15 text-orange-400
+                                {% else %}bg-green-500/15 text-green-400{% endif %}">
+                                {{ p.desafio.get_categoria_display|default:p.desafio.categoria }}
+                            </span>
+                            <span class="text-xs text-gray-500">📅 {{ p.desafio.data_fim|date:"d/m/Y" }}</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white truncate">{{ p.desafio.titulo }}</h3>
+                        <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                            <span>⚡ {{ p.desafio.xp_recompensa }} XP</span>
+                            <span>💰 {{ p.desafio.coins_recompensa }} coins</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-4 w-full sm:w-auto">
+                        <div class="flex-1 sm:w-32">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs text-gray-500">Progresso</span>
+                                <span class="text-xs font-bold text-emerald-400">{{ p.progresso|default:"0" }}%</span>
+                            </div>
+                            <div class="w-full h-2 rounded-full bg-white/5 overflow-hidden">
+                                <div class="progress-fill h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500"
+                                     style="width: {{ p.progresso|default:'0' }}%"></div>
+                            </div>
+                        </div>
+                        <a href="{% url 'detalhe_desafio' p.desafio.id %}" class="px-4 py-2 rounded-xl text-xs font-bold bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all whitespace-nowrap">
+                            Ver →
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="glass rounded-2xl p-8 text-center">
+            <div class="text-4xl mb-3">🎯</div>
+            <h3 class="text-lg font-bold text-white mb-2">Nenhum desafio ativo</h3>
+            <p class="text-gray-400 text-sm mb-4">Explore desafios disponíveis e comece a evoluir!</p>
+            <a href="{% url 'explorar_desafios' %}" class="inline-flex items-center px-6 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-emerald-500 to-cyan-500 text-white hover:from-emerald-600 hover:to-cyan-600 transition-all">
+                Explorar Desafios
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ========== COMPLETED ========== -->
+    {% if participacoes_concluidas %}
+    <div class="mb-10">
+        <h2 class="text-xl font-bold text-white mb-5 flex items-center space-x-2">
+            <span>✅</span>
+            <span>Concluídos</span>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 ml-2">
+                {{ participacoes_concluidas|length }}
+            </span>
+        </h2>
+        <div class="space-y-3">
+            {% for p in participacoes_concluidas %}
+            <div class="glass rounded-xl p-4 flex items-center justify-between hover:bg-white/[0.04] transition-colors">
+                <div class="flex items-center space-x-3 min-w-0">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-sm flex-shrink-0">✅</div>
+                    <div class="min-w-0">
+                        <h3 class="text-sm font-medium text-white truncate">{{ p.desafio.titulo }}</h3>
+                        <span class="text-xs text-gray-500">{{ p.data_conclusao|date:"d/m/Y" }}</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 text-xs text-gray-400 ml-4">
+                    <span>+{{ p.desafio.xp_recompensa }} XP</span>
+                    <span>+{{ p.desafio.coins_recompensa }} 💰</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ========== MY CREATED CHALLENGES ========== -->
+    <div>
+        <h2 class="text-xl font-bold text-white mb-5 flex items-center space-x-2">
+            <span>📝</span>
+            <span>Desafios Criados por Mim</span>
+        </h2>
+
+        {% if meus_desafios_criados %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {% for desafio in meus_desafios_criados %}
+            <div class="glass rounded-2xl p-5 card-hover">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider
+                        {% if desafio.status == 'ativo' %}bg-emerald-500/15 text-emerald-400
+                        {% elif desafio.status == 'finalizado' %}bg-gray-500/15 text-gray-400
+                        {% else %}bg-yellow-500/15 text-yellow-400{% endif %}">
+                        {{ desafio.status }}
+                    </span>
+                    <span class="text-xs text-gray-500">👥 {{ desafio.participantes_count|default:"0" }}</span>
+                </div>
+                <h3 class="text-base font-bold text-white mb-2">{{ desafio.titulo }}</h3>
+                <div class="flex items-center space-x-3 text-xs text-gray-500">
+                    <span>📅 {{ desafio.data_inicio|date:"d/m" }} - {{ desafio.data_fim|date:"d/m" }}</span>
+                </div>
+                <a href="{% url 'detalhe_desafio' desafio.id %}" class="block w-full text-center mt-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-white hover:bg-white/10 border border-white/5 transition-all">
+                    Gerenciar →
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="glass rounded-2xl p-8 text-center">
+            <div class="text-4xl mb-3">📝</div>
+            <h3 class="text-lg font-bold text-white mb-2">Nenhum desafio criado</h3>
+            <p class="text-gray-400 text-sm mb-4">Crie seu primeiro desafio e motive a comunidade!</p>
+            <a href="{% url 'criar_desafio' %}" class="inline-flex items-center px-6 py-2.5 rounded-xl text-sm font-bold bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all">
+                + Criar Desafio
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

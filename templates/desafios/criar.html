@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% block title %}Criar Desafio{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Page Header -->
+    <div class="mb-8 animate-fade-in">
+        <h1 class="text-3xl font-extrabold text-white flex items-center space-x-3">
+            <span>🎯</span>
+            <span>{% if editando %}Editar Desafio{% else %}Criar Novo Desafio{% endif %}</span>
+        </h1>
+        <p class="text-gray-400 mt-2">Crie um desafio e motive outros devs a evoluírem</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+        <!-- ========== FORM ========== -->
+        <div class="lg:col-span-2">
+            <div class="glass rounded-2xl p-6 sm:p-8 animate-slide-up">
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+
+                    <!-- Título -->
+                    <div>
+                        <label for="id_titulo" class="block text-sm font-medium text-gray-300 mb-2">
+                            Título do Desafio *
+                        </label>
+                        <input type="text" name="titulo" id="id_titulo" required
+                            value="{{ form.titulo.value|default:'' }}"
+                            class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all"
+                            placeholder="ex: 30 dias de commits no GitHub">
+                        {% if form.titulo.errors %}
+                        <p class="text-red-400 text-xs mt-1">{{ form.titulo.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Descrição -->
+                    <div>
+                        <label for="id_descricao" class="block text-sm font-medium text-gray-300 mb-2">
+                            Descrição *
+                        </label>
+                        <textarea name="descricao" id="id_descricao" rows="5" required
+                            class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all resize-none"
+                            placeholder="Descreva o desafio em detalhes...">{{ form.descricao.value|default:'' }}</textarea>
+                        {% if form.descricao.errors %}
+                        <p class="text-red-400 text-xs mt-1">{{ form.descricao.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Categoria + Tipo -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="id_categoria" class="block text-sm font-medium text-gray-300 mb-2">Categoria *</label>
+                            <select name="categoria" id="id_categoria" required
+                                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all appearance-none cursor-pointer">
+                                <option value="" class="bg-brand-800">Selecione...</option>
+                                <option value="programacao" class="bg-brand-800" {% if form.categoria.value == 'programacao' %}selected{% endif %}>💻 Programação</option>
+                                <option value="design" class="bg-brand-800" {% if form.categoria.value == 'design' %}selected{% endif %}>🎨 Design</option>
+                                <option value="dados" class="bg-brand-800" {% if form.categoria.value == 'dados' %}selected{% endif %}>📊 Dados</option>
+                                <option value="devops" class="bg-brand-800" {% if form.categoria.value == 'devops' %}selected{% endif %}>⚙️ DevOps</option>
+                                <option value="estudo" class="bg-brand-800" {% if form.categoria.value == 'estudo' %}selected{% endif %}>📚 Estudo</option>
+                            </select>
+                            {% if form.categoria.errors %}
+                            <p class="text-red-400 text-xs mt-1">{{ form.categoria.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label for="id_tipo" class="block text-sm font-medium text-gray-300 mb-2">Tipo *</label>
+                            <select name="tipo" id="id_tipo" required
+                                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all appearance-none cursor-pointer">
+                                <option value="" class="bg-brand-800">Selecione...</option>
+                                <option value="diario" class="bg-brand-800" {% if form.tipo.value == 'diario' %}selected{% endif %}>Diário</option>
+                                <option value="semanal" class="bg-brand-800" {% if form.tipo.value == 'semanal' %}selected{% endif %}>Semanal</option>
+                                <option value="mensal" class="bg-brand-800" {% if form.tipo.value == 'mensal' %}selected{% endif %}>Mensal</option>
+                                <option value="unico" class="bg-brand-800" {% if form.tipo.value == 'unico' %}selected{% endif %}>Único</option>
+                            </select>
+                            {% if form.tipo.errors %}
+                            <p class="text-red-400 text-xs mt-1">{{ form.tipo.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Regras -->
+                    <div>
+                        <label for="id_regras" class="block text-sm font-medium text-gray-300 mb-2">
+                            Regras <span class="text-gray-600">(opcional)</span>
+                        </label>
+                        <textarea name="regras" id="id_regras" rows="3"
+                            class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all resize-none"
+                            placeholder="Regras específicas do desafio...">{{ form.regras.value|default:'' }}</textarea>
+                        {% if form.regras.errors %}
+                        <p class="text-red-400 text-xs mt-1">{{ form.regras.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Datas -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="id_data_inicio" class="block text-sm font-medium text-gray-300 mb-2">Data de Início *</label>
+                            <input type="date" name="data_inicio" id="id_data_inicio" required
+                                value="{{ form.data_inicio.value|default:'' }}"
+                                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all">
+                            {% if form.data_inicio.errors %}
+                            <p class="text-red-400 text-xs mt-1">{{ form.data_inicio.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label for="id_data_fim" class="block text-sm font-medium text-gray-300 mb-2">Data de Fim *</label>
+                            <input type="date" name="data_fim" id="id_data_fim" required
+                                value="{{ form.data_fim.value|default:'' }}"
+                                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all">
+                            {% if form.data_fim.errors %}
+                            <p class="text-red-400 text-xs mt-1">{{ form.data_fim.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Recompensas -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label for="id_xp" class="block text-sm font-medium text-gray-300 mb-2">XP Recompensa</label>
+                            <input type="number" name="xp_recompensa" id="id_xp" min="0" required
+                                value="{{ form.xp_recompensa.value|default:'100' }}"
+                                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all">
+                            {% if form.xp_recompensa.errors %}
+                            <p class="text-red-400 text-xs mt-1">{{ form.xp_recompensa.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label for="id_coins" class="block text-sm font-medium text-gray-300 mb-2">Prêmio Reais (R$) *</label>
+                            <input type="number" name="coins_recompensa" id="id_coins" min="0" step="0.01" required
+                                value="{{ form.coins_recompensa.value|default:'50.00'|floatformat:2 }}"
+                                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all">
+                            {% if form.coins_recompensa.errors %}
+                            <p class="text-red-400 text-xs mt-1">{{ form.coins_recompensa.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label for="id_max_participantes" class="block text-sm font-medium text-gray-300 mb-2">Max. Participantes *</label>
+                            <input type="number" name="max_participantes" id="id_max_participantes" min="1" required
+                                value="{{ form.max_participantes.value|default:'50' }}"
+                                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all"
+                                placeholder="ex: 50">
+                            {% if form.max_participantes.errors %}
+                            <p class="text-red-400 text-xs mt-1">{{ form.max_participantes.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Público -->
+                    <div class="flex items-center space-x-3 bg-white/5 p-4 rounded-xl border border-white/10">
+                        <input type="checkbox" name="publico" id="id_publico" class="w-5 h-5 rounded border-gray-500 text-emerald-500 focus:ring-emerald-500/50 bg-brand-900 cursor-pointer"
+                            {% if form.publico.value or not form.is_bound %}checked{% endif %}>
+                        <label for="id_publico" class="text-sm font-medium text-white cursor-pointer select-none">
+                            Tornar este desafio público
+                            <p class="text-xs text-gray-500 mt-1 font-normal">Desafios públicos aparecem na página Explorar. Se desmarcado, apenas quem tiver o link poderá acessar.</p>
+                        </label>
+                    </div>
+
+                    <!-- Form Errors -->
+                    {% if form.non_field_errors %}
+                    <div class="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                        {% for error in form.non_field_errors %}
+                        <p class="text-sm text-red-400">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Submit -->
+                    <div class="flex items-center justify-end space-x-4 pt-2">
+                        <a href="{% url 'explorar_desafios' %}" class="px-6 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="px-8 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-[1.01] transition-all duration-300">
+                            {% if editando %}Atualizar Desafio 🚀{% else %}Criar Desafio 🚀{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ========== PREVIEW SIDEBAR ========== -->
+        <div>
+            <div class="glass rounded-2xl p-6 sticky top-24">
+                <h3 class="text-base font-bold text-white mb-4 flex items-center space-x-2">
+                    <span>👁️</span>
+                    <span>Pré-visualização</span>
+                </h3>
+
+                <div class="bg-white/[0.02] rounded-xl p-4 border border-white/5">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <span id="preview-cat-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/5 text-gray-400 uppercase tracking-wider">
+                            Categoria
+                        </span>
+                        <span id="preview-type-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/5 text-gray-400 uppercase tracking-wider">
+                            Tipo
+                        </span>
+                    </div>
+                    <h4 id="preview-title" class="text-base font-bold text-white mb-2">Título do desafio</h4>
+                    <p id="preview-desc" class="text-gray-500 text-xs line-clamp-3 mb-3">Descrição aparecerá aqui...</p>
+                    <div class="flex items-center space-x-3">
+                        <span id="preview-xp" class="text-xs text-emerald-400 font-bold">⚡ 100 XP</span>
+                        <span id="preview-coins" class="text-xs text-yellow-400 font-bold">💳 R$ 50.00</span>
+                    </div>
+                </div>
+
+                <div class="mt-4 space-y-2 text-xs text-gray-600">
+                    <p>💡 Dicas:</p>
+                    <ul class="list-disc list-inside space-y-1 text-gray-500">
+                        <li>Seja específico no título</li>
+                        <li>Descreva critérios claros de conclusão</li>
+                        <li>Defina regras justas para todos</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Live preview
+    const titleInput = document.getElementById('id_titulo');
+    const descInput = document.getElementById('id_descricao');
+    const catInput = document.getElementById('id_categoria');
+    const typeInput = document.getElementById('id_tipo');
+    const xpInput = document.getElementById('id_xp');
+    const coinsInput = document.getElementById('id_coins');
+
+    const previewTitle = document.getElementById('preview-title');
+    const previewDesc = document.getElementById('preview-desc');
+    const previewCat = document.getElementById('preview-cat-badge');
+    const previewType = document.getElementById('preview-type-badge');
+    const previewXp = document.getElementById('preview-xp');
+    const previewCoins = document.getElementById('preview-coins');
+
+    if (titleInput) titleInput.addEventListener('input', e => previewTitle.textContent = e.target.value || 'Título do desafio');
+    if (descInput) descInput.addEventListener('input', e => previewDesc.textContent = e.target.value || 'Descrição aparecerá aqui...');
+    if (catInput) catInput.addEventListener('change', e => previewCat.textContent = e.target.selectedOptions[0]?.text || 'Categoria');
+    if (typeInput) typeInput.addEventListener('change', e => previewType.textContent = e.target.selectedOptions[0]?.text || 'Tipo');
+    if (xpInput) xpInput.addEventListener('input', e => previewXp.textContent = `⚡ ${e.target.value || '0'} XP`);
+    if (coinsInput) coinsInput.addEventListener('input', e => previewCoins.textContent = `💳 R$ ${e.target.value || '0.00'}`);
+</script>
+{% endblock %}

@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Explorar Desafios{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Page Header -->
+    <div class="mb-8 animate-fade-in">
+        <h1 class="text-3xl font-extrabold text-white flex items-center space-x-3">
+            <span>🔍</span>
+            <span>Explorar Desafios</span>
+        </h1>
+        <p class="text-gray-400 mt-2">Encontre desafios incríveis e comece a evoluir</p>
+    </div>
+
+    <!-- ========== SEARCH & FILTERS ========== -->
+    <div class="glass rounded-2xl p-5 mb-8 animate-slide-up">
+        <!-- Search Bar -->
+        <form method="get" class="mb-4">
+            <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </span>
+                <input type="text" name="q" value="{{ query|default:'' }}"
+                    class="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all"
+                    placeholder="Buscar desafios por nome, descrição...">
+            </div>
+        </form>
+
+        <!-- Category Filters -->
+        <div class="flex flex-wrap gap-2">
+            <a href="{% url 'explorar_desafios' %}"
+               class="px-4 py-2 rounded-xl text-sm font-medium transition-all
+               {% if not categoria_selecionada %}bg-emerald-500/20 text-emerald-400 border border-emerald-500/30{% else %}bg-white/5 text-gray-400 border border-white/5 hover:bg-white/10 hover:text-white{% endif %}">
+                Todos
+            </a>
+            <a href="?categoria=programacao"
+               class="px-4 py-2 rounded-xl text-sm font-medium transition-all
+               {% if categoria_selecionada == 'programacao' %}bg-blue-500/20 text-blue-400 border border-blue-500/30{% else %}bg-white/5 text-gray-400 border border-white/5 hover:bg-white/10 hover:text-white{% endif %}">
+                💻 Programação
+            </a>
+            <a href="?categoria=design"
+               class="px-4 py-2 rounded-xl text-sm font-medium transition-all
+               {% if categoria_selecionada == 'design' %}bg-pink-500/20 text-pink-400 border border-pink-500/30{% else %}bg-white/5 text-gray-400 border border-white/5 hover:bg-white/10 hover:text-white{% endif %}">
+                🎨 Design
+            </a>
+            <a href="?categoria=dados"
+               class="px-4 py-2 rounded-xl text-sm font-medium transition-all
+               {% if categoria_selecionada == 'dados' %}bg-purple-500/20 text-purple-400 border border-purple-500/30{% else %}bg-white/5 text-gray-400 border border-white/5 hover:bg-white/10 hover:text-white{% endif %}">
+                📊 Dados
+            </a>
+            <a href="?categoria=devops"
+               class="px-4 py-2 rounded-xl text-sm font-medium transition-all
+               {% if categoria_selecionada == 'devops' %}bg-orange-500/20 text-orange-400 border border-orange-500/30{% else %}bg-white/5 text-gray-400 border border-white/5 hover:bg-white/10 hover:text-white{% endif %}">
+                ⚙️ DevOps
+            </a>
+            <a href="?categoria=estudo"
+               class="px-4 py-2 rounded-xl text-sm font-medium transition-all
+               {% if categoria_selecionada == 'estudo' %}bg-green-500/20 text-green-400 border border-green-500/30{% else %}bg-white/5 text-gray-400 border border-white/5 hover:bg-white/10 hover:text-white{% endif %}">
+                📚 Estudo
+            </a>
+        </div>
+    </div>
+
+    <!-- ========== CHALLENGES GRID ========== -->
+    {% if desafios %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for desafio in desafios %}
+        <div class="glass rounded-2xl overflow-hidden card-hover group animate-slide-up" style="animation-delay: {{ forloop.counter0 }}00ms;">
+            <!-- Card Top Gradient -->
+            <div class="h-1.5 bg-gradient-to-r
+                {% if desafio.categoria == 'programacao' %}from-blue-500 to-blue-400
+                {% elif desafio.categoria == 'design' %}from-pink-500 to-pink-400
+                {% elif desafio.categoria == 'dados' %}from-purple-500 to-purple-400
+                {% elif desafio.categoria == 'devops' %}from-orange-500 to-orange-400
+                {% else %}from-green-500 to-green-400{% endif %}">
+            </div>
+
+            <div class="p-6">
+                <!-- Badges -->
+                <div class="flex items-center space-x-2 mb-3">
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider
+                        {% if desafio.categoria == 'programacao' %}bg-blue-500/15 text-blue-400
+                        {% elif desafio.categoria == 'design' %}bg-pink-500/15 text-pink-400
+                        {% elif desafio.categoria == 'dados' %}bg-purple-500/15 text-purple-400
+                        {% elif desafio.categoria == 'devops' %}bg-orange-500/15 text-orange-400
+                        {% else %}bg-green-500/15 text-green-400{% endif %}">
+                        {{ desafio.get_categoria_display|default:desafio.categoria }}
+                    </span>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/5 text-gray-400 uppercase tracking-wider">
+                        {{ desafio.get_tipo_display|default:desafio.tipo }}
+                    </span>
+                </div>
+
+                <!-- Title -->
+                <h3 class="text-lg font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors line-clamp-2">
+                    {{ desafio.titulo }}
+                </h3>
+
+                <!-- Description snippet -->
+                <p class="text-gray-500 text-sm mb-4 line-clamp-2">{{ desafio.descricao|truncatewords:20 }}</p>
+
+                <!-- Stats Row -->
+                <div class="flex items-center justify-between text-xs text-gray-500 mb-4">
+                    <span class="flex items-center space-x-1">
+                        <span>👥</span>
+                        <span>{{ desafio.participantes_count|default:"0" }} participantes</span>
+                    </span>
+                    <span class="flex items-center space-x-1">
+                        <span>📅</span>
+                        <span>{{ desafio.data_fim|date:"d/m" }}</span>
+                    </span>
+                </div>
+
+                <!-- Rewards -->
+                <div class="flex items-center space-x-4 mb-5">
+                    <div class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
+                        <span class="text-xs">⚡</span>
+                        <span class="text-xs font-bold">{{ desafio.xp_recompensa }} XP</span>
+                    </div>
+                    <div class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-yellow-500/10 text-yellow-400">
+                        <span class="text-xs">💳</span>
+                        <span class="text-xs font-bold">R$ {{ desafio.coins_recompensa|floatformat:2 }}</span>
+                    </div>
+                </div>
+
+                <!-- User participation progress (if applicable) -->
+                {% if desafio.user_progresso is not None %}
+                <div class="mb-4">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs text-gray-500">Seu progresso</span>
+                        <span class="text-xs text-emerald-400 font-bold">{{ desafio.user_progresso }}%</span>
+                    </div>
+                    <div class="w-full h-1.5 rounded-full bg-white/5 overflow-hidden">
+                        <div class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500"
+                             style="width: {{ desafio.user_progresso }}%"></div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- CTA Button -->
+                <a href="{% url 'detalhe_desafio' desafio.id %}"
+                   class="block w-full text-center py-2.5 rounded-xl text-sm font-bold
+                   {% if desafio.user_progresso is not None %}
+                   bg-white/5 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/10
+                   {% else %}
+                   bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white shadow-lg shadow-emerald-500/10
+                   {% endif %}
+                   transition-all">
+                    {% if desafio.user_progresso is not None %}Continuar{% else %}Ver Detalhes{% endif %}
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty state -->
+    <div class="glass rounded-2xl p-12 text-center">
+        <div class="text-5xl mb-4">🔍</div>
+        <h3 class="text-xl font-bold text-white mb-2">Nenhum desafio encontrado</h3>
+        <p class="text-gray-400 text-sm mb-6">Tente ajustar seus filtros ou buscar por outro termo</p>
+        <a href="{% url 'explorar_desafios' %}" class="inline-flex items-center px-6 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-emerald-500 to-cyan-500 text-white hover:from-emerald-600 hover:to-cyan-600 transition-all">
+            Limpar Filtros
+        </a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Bolões{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 animate-fade-in">
+        <div>
+            <h1 class="text-3xl font-extrabold text-white flex items-center space-x-3">
+                <span>💰</span>
+                <span>Bolões</span>
+            </h1>
+            <p class="text-gray-400 mt-2">Aposte em si mesmo e ganhe prêmios incríveis</p>
+        </div>
+        <a href="{% url 'criar_bolao' %}" class="mt-4 sm:mt-0 px-6 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-[1.02] transition-all">
+            + Criar Bolão
+        </a>
+    </div>
+
+    <!-- ========== BOLÕES GRID ========== -->
+    {% if boloes %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for bolao in boloes %}
+        <div class="glass rounded-2xl overflow-hidden card-hover group animate-slide-up" style="animation-delay: {{ forloop.counter0 }}00ms;">
+            <!-- Card Top Accent -->
+            <div class="h-1.5 bg-gradient-to-r from-yellow-500 via-emerald-500 to-cyan-500"></div>
+
+            <div class="p-6">
+                <!-- Status Badge -->
+                <div class="flex items-center justify-between mb-3">
+                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
+                        {% if bolao.status == 'aberto' %}bg-emerald-500/15 text-emerald-400
+                        {% elif bolao.status == 'em_andamento' %}bg-blue-500/15 text-blue-400
+                        {% elif bolao.status == 'finalizado' %}bg-gray-500/15 text-gray-400
+                        {% else %}bg-yellow-500/15 text-yellow-400{% endif %}">
+                        {% if bolao.status == 'aberto' %}
+                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1"></span>
+                        {% endif %}
+                        {{ bolao.status_display }}
+                    </span>
+                </div>
+
+                <!-- Title -->
+                <h3 class="text-lg font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">
+                    {{ bolao.titulo }}
+                </h3>
+
+                <!-- Prize Pool -->
+                <div class="flex items-center justify-center p-4 rounded-xl bg-gradient-to-br from-yellow-500/10 to-emerald-500/10 border border-yellow-500/10 mb-4">
+                    <div class="text-center">
+                        <div class="text-xs text-gray-400 font-medium mb-1">🏆 Prêmio Total</div>
+                        <div class="text-3xl font-extrabold gradient-text-emerald">R$ {{ bolao.premio_total|default:"0.00"|floatformat:2 }}</div>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 gap-3 mb-5">
+                    <div class="bg-white/[0.03] rounded-lg p-2.5 text-center">
+                        <div class="text-sm font-bold text-white">R$ {{ bolao.valor_entrada|floatformat:2 }}</div>
+                        <div class="text-[10px] text-gray-500 mt-0.5">💳 Entrada</div>
+                    </div>
+                    <div class="bg-white/[0.03] rounded-lg p-2.5 text-center">
+                        <div class="text-sm font-bold text-white">{{ bolao.participantes_count|default:"0" }}/{{ bolao.max_participantes|default:"∞" }}</div>
+                        <div class="text-[10px] text-gray-500 mt-0.5">👥 Vagas</div>
+                    </div>
+                </div>
+
+                <!-- Dates -->
+                <div class="text-xs text-gray-500 mb-4">
+                    📅 {{ bolao.data_inicio|date:"d/m" }} — {{ bolao.data_fim|date:"d/m/Y" }}
+                </div>
+
+                <!-- CTA -->
+                <a href="{% url 'detalhe_bolao' bolao.id %}"
+                   class="block w-full text-center py-2.5 rounded-xl text-sm font-bold
+                   {% if bolao.status == 'aberto' %}
+                   bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white shadow-lg shadow-emerald-500/10
+                   {% else %}
+                   bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10
+                   {% endif %}
+                   transition-all">
+                    {% if bolao.status == 'aberto' %}Entrar no Bolão{% else %}Ver Detalhes{% endif %}
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty state -->
+    <div class="glass rounded-2xl p-12 text-center">
+        <div class="text-5xl mb-4">💰</div>
+        <h3 class="text-xl font-bold text-white mb-2">Nenhum bolão disponível</h3>
+        <p class="text-gray-400 text-sm mb-6">Crie o primeiro bolão e desafie seus amigos!</p>
+        <a href="{% url 'criar_bolao' %}" class="inline-flex items-center px-6 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-emerald-500 to-cyan-500 text-white hover:from-emerald-600 hover:to-cyan-600 transition-all">
+            + Criar Bolão
+        </a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

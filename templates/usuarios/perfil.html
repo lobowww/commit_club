@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Meu Perfil{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Page Header -->
+    <div class="mb-8 animate-fade-in">
+        <h1 class="text-3xl font-extrabold text-white flex items-center space-x-3">
+            <span>👤</span>
+            <span>Meu Perfil</span>
+        </h1>
+        <p class="text-gray-400 mt-2">Gerencie suas informações pessoais e acompanhe seus stats</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+        <!-- ========== LEFT: PROFILE CARD ========== -->
+        <div class="lg:col-span-1">
+            <!-- Avatar & Info Card -->
+            <div class="glass rounded-2xl p-6 text-center card-hover animate-slide-up">
+                <!-- Avatar -->
+                <div class="relative inline-block mb-4">
+                    <div class="w-28 h-28 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-4xl font-bold text-white shadow-lg shadow-emerald-500/20 mx-auto">
+                        {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="w-full h-full rounded-2xl object-cover">
+                        {% else %}
+                            {{ user.username|first|upper }}
+                        {% endif %}
+                    </div>
+                    <div class="absolute -bottom-1 -right-1 w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center text-sm border-2 border-brand-900">
+                        ⭐
+                    </div>
+                </div>
+                <h2 class="text-xl font-bold text-white">{{ user.first_name|default:user.username }}</h2>
+                <p class="text-gray-500 text-sm">@{{ user.username }}</p>
+                {% if user.github_username %}
+                <a href="https://github.com/{{ user.github_username }}" target="_blank" class="inline-flex items-center space-x-1.5 text-xs text-gray-400 hover:text-emerald-400 mt-2 transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    <span>{{ user.github_username }}</span>
+                </a>
+                {% endif %}
+
+                <!-- Divider -->
+                <div class="border-t border-white/5 my-5"></div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 gap-4 text-center">
+                    <div>
+                        <div class="text-2xl font-extrabold text-white">{{ user.nivel|default:"5" }}</div>
+                        <div class="text-xs text-gray-500 mt-0.5">Nível</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-extrabold text-white">{{ user.xp_total|default:"2450" }}</div>
+                        <div class="text-xs text-gray-500 mt-0.5">XP</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-extrabold text-white">{{ user.coins|default:"180" }}</div>
+                        <div class="text-xs text-gray-500 mt-0.5">Coins 💰</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-extrabold text-white">{{ user.streak_atual|default:"7" }}</div>
+                        <div class="text-xs text-gray-500 mt-0.5">Streak 🔥</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== RIGHT: EDIT FORM ========== -->
+        <div class="lg:col-span-2">
+            <div class="glass rounded-2xl p-6 sm:p-8 animate-slide-up" style="animation-delay: 0.1s;">
+                <h2 class="text-xl font-bold text-white mb-6 flex items-center space-x-2">
+                    <span>✏️</span>
+                    <span>Editar Informações</span>
+                </h2>
+
+                <form method="post" enctype="multipart/form-data" class="space-y-5">
+                    {% csrf_token %}
+
+                    <!-- Avatar Upload -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Foto de Perfil</label>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border-2 border-dashed border-white/10 flex items-center justify-center">
+                                <span class="text-2xl">📷</span>
+                            </div>
+                            <input type="file" name="avatar" accept="image/*" class="text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-500/10 file:text-emerald-400 hover:file:bg-emerald-500/20 file:cursor-pointer file:transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Nome Completo -->
+                    <div>
+                        <label for="id_nome_completo" class="block text-sm font-medium text-gray-300 mb-2">Nome Completo</label>
+                        <input type="text" name="nome_completo" id="id_nome_completo"
+                            value="{{ form.nome_completo.value|default:user.first_name }}"
+                            class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all"
+                            placeholder="Seu nome completo">
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="id_email" class="block text-sm font-medium text-gray-300 mb-2">E-mail</label>
+                        <input type="email" name="email" id="id_email"
+                            value="{{ form.email.value|default:user.email }}"
+                            class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all"
+                            placeholder="seu@email.com">
+                    </div>
+
+                    <!-- Bio -->
+                    <div>
+                        <label for="id_bio" class="block text-sm font-medium text-gray-300 mb-2">Bio</label>
+                        <textarea name="bio" id="id_bio" rows="3"
+                            class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all resize-none"
+                            placeholder="Conte um pouco sobre você...">{{ form.bio.value|default:user.bio }}</textarea>
+                    </div>
+
+                    <!-- GitHub Username -->
+                    <div>
+                        <label for="id_github" class="block text-sm font-medium text-gray-300 mb-2">GitHub Username</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">@</span>
+                            <input type="text" name="github_username" id="id_github"
+                                value="{{ form.github_username.value|default:user.github_username }}"
+                                class="w-full pl-9 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all"
+                                placeholder="seu-github">
+                        </div>
+                    </div>
+
+                    <!-- LinkedIn -->
+                    <div>
+                        <label for="id_linkedin" class="block text-sm font-medium text-gray-300 mb-2">LinkedIn URL</label>
+                        <input type="url" name="linkedin_url" id="id_linkedin"
+                            value="{{ form.linkedin_url.value|default:user.linkedin_url }}"
+                            class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 focus:outline-none transition-all"
+                            placeholder="https://linkedin.com/in/seu-perfil">
+                    </div>
+
+                    <!-- Form errors -->
+                    {% if form.errors %}
+                    <div class="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                            <p class="text-sm text-red-400">{{ error }}</p>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Submit -->
+                    <div class="flex items-center justify-end space-x-4 pt-2">
+                        <a href="{% url 'dashboard' %}" class="px-6 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="px-8 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-[1.01] transition-all duration-300">
+                            Salvar Alterações ✨
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

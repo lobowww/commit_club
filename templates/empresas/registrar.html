@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar Empresa{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <div class="text-5xl mb-4">🏢</div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Registrar sua Empresa</h1>
+        <p class="text-gray-400 text-sm mt-2">Patrocine desafios e encontre talentos na comunidade dev</p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="glass rounded-2xl p-6 sm:p-8">
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                    {{ field.label }}
+                </label>
+                {% if field.name == 'descricao' %}
+                <textarea name="{{ field.html_name }}" id="{{ field.id_for_label }}" rows="4"
+                    class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all resize-none text-sm"
+                    placeholder="Descreva sua empresa...">{{ field.value|default:'' }}</textarea>
+                {% elif field.name == 'logo' %}
+                <input type="file" name="{{ field.html_name }}" id="{{ field.id_for_label }}" accept="image/*"
+                    class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-500/20 file:text-emerald-400 hover:file:bg-emerald-500/30">
+                {% else %}
+                <input type="{{ field.field.widget.input_type|default:'text' }}"
+                    name="{{ field.html_name }}" id="{{ field.id_for_label }}"
+                    value="{{ field.value|default:'' }}"
+                    class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all text-sm"
+                    placeholder="{{ field.label }}">
+                {% endif %}
+                {% if field.errors %}
+                <p class="text-red-400 text-xs mt-1">{{ field.errors.0 }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit"
+                class="w-full py-3.5 rounded-xl text-sm font-bold bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-[1.01] transition-all duration-300">
+                Registrar Empresa 🏢
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

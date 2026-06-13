@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}Enviar Comprovação{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="{% url 'detalhe_desafio' participacao.desafio.pk %}" class="inline-flex items-center text-sm text-gray-400 hover:text-emerald-400 transition-colors mb-4">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Voltar ao Desafio
+        </a>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center space-x-3">
+            <span>📎</span>
+            <span>Enviar Comprovação</span>
+        </h1>
+        <p class="text-gray-400 text-sm mt-2">
+            Desafio: <span class="text-white font-medium">{{ participacao.desafio.titulo }}</span>
+        </p>
+    </div>
+
+    <!-- Current Progress -->
+    <div class="glass rounded-2xl p-5 mb-6">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-sm text-gray-400">Seu progresso atual</span>
+            <span class="text-sm font-bold text-emerald-400">{{ participacao.progresso }}%</span>
+        </div>
+        <div class="w-full h-2.5 rounded-full bg-white/5 overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500 transition-all"
+                 style="width: {{ participacao.progresso }}%"></div>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <form method="post" enctype="multipart/form-data" class="space-y-6" id="comprovacao-form">
+        {% csrf_token %}
+
+        <!-- Tipo de Envio -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <label class="cursor-pointer">
+                <input type="radio" name="tipo_envio" value="github" class="peer sr-only" checked onchange="toggleEnvio()">
+                <div class="p-4 rounded-xl border-2 border-white/10 bg-white/5 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10 transition-all hover:bg-white/10 h-full flex flex-col items-center justify-center text-center">
+                    <div class="text-2xl mb-2">🐙</div>
+                    <div class="text-sm font-bold text-white">Link GitHub</div>
+                    <div class="text-[10px] text-gray-500 mt-1">commit / repo</div>
+                </div>
+            </label>
+            <label class="cursor-pointer">
+                <input type="radio" name="tipo_envio" value="print" class="peer sr-only" onchange="toggleEnvio()">
+                <div class="p-4 rounded-xl border-2 border-white/10 bg-white/5 peer-checked:border-cyan-500 peer-checked:bg-cyan-500/10 transition-all hover:bg-white/10 h-full flex flex-col items-center justify-center text-center">
+                    <div class="text-2xl mb-2">🖼️</div>
+                    <div class="text-sm font-bold text-white">Print de Tela</div>
+                    <div class="text-[10px] text-gray-500 mt-1">PNG ou JPG</div>
+                </div>
+            </label>
+        </div>
+
+        <div id="github-section" class="space-y-4 animate-fade-in block">
+            <div>
+                <label for="id_link" class="block text-xs text-gray-400 mb-2 uppercase tracking-wide">
+                    URL do commit ou repositório
+                </label>
+                <input type="url" name="link" id="id_link"
+                    class="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all text-sm"
+                    placeholder="https://github.com/user/repo/commit/...">
+            </div>
+            
+            <div class="flex items-center space-x-2 px-4 py-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 cursor-pointer hover:bg-emerald-500/10 transition-colors" onclick="simularValidacao()">
+                <span class="text-emerald-400">🛡️</span>
+                <span class="text-xs font-semibold text-emerald-400">Validação automática via API GitHub</span>
+                <span id="validacao-spinner" class="hidden text-xs text-emerald-400 ml-auto animate-pulse">Validando...</span>
+                <span id="validacao-ok" class="hidden text-xs text-emerald-400 ml-auto font-bold">OK ✓</span>
+            </div>
+        </div>
+
+        <div id="print-section" class="space-y-4 animate-fade-in hidden">
+            <label class="block text-xs text-gray-400 mb-2 uppercase tracking-wide">
+                Upload do arquivo
+            </label>
+            <div class="w-full px-4 py-8 rounded-xl bg-white/5 border-2 border-dashed border-white/10 text-center hover:border-cyan-500/30 transition-colors cursor-pointer">
+                <input type="file" name="arquivo" id="id_arquivo" class="hidden" onchange="document.getElementById('file-label').textContent = this.files[0]?.name || 'Selecionar arquivo'">
+                <label for="id_arquivo" class="cursor-pointer">
+                    <div class="text-3xl mb-3 text-cyan-400">☁️</div>
+                    <p class="text-sm font-bold text-white mb-1">Ou arraste um print aqui</p>
+                    <p id="file-label" class="text-[10px] text-gray-500">PNG ou JPG - max 10MB</p>
+                </label>
+            </div>
+        </div>
+        
+        <!-- Descrição Oculta (mas preenchida no backend) -->
+        <input type="hidden" name="descricao" id="id_descricao" value="Envio de Comprovação Diária">
+
+        <button type="submit" id="btn-submit"
+            class="w-full py-4 rounded-xl text-sm font-bold bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all duration-300 flex items-center justify-center space-x-2 mt-4">
+            <span>✓ Confirmar e manter ofensiva</span>
+            <span>🔥</span>
+        </button>
+    </form>
+
+    <script>
+        function toggleEnvio() {
+            const isGithub = document.querySelector('input[name="tipo_envio"]:checked').value === 'github';
+            document.getElementById('github-section').classList.toggle('hidden', !isGithub);
+            document.getElementById('github-section').classList.toggle('block', isGithub);
+            
+            document.getElementById('print-section').classList.toggle('hidden', isGithub);
+            document.getElementById('print-section').classList.toggle('block', !isGithub);
+            
+            const btn = document.getElementById('btn-submit');
+            if(isGithub) {
+                btn.className = "w-full py-4 rounded-xl text-sm font-bold border border-white/10 text-white transition-all duration-300 flex items-center justify-center space-x-2 mt-4 bg-white/5 hover:bg-white/10";
+            } else {
+                btn.className = "w-full py-4 rounded-xl text-sm font-bold text-white transition-all duration-300 flex items-center justify-center space-x-2 mt-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 shadow-lg shadow-cyan-500/20";
+            }
+        }
+        
+        function simularValidacao() {
+            const link = document.getElementById('id_link').value;
+            if(!link) return alert("Insira um link primeiro.");
+            
+            document.getElementById('validacao-spinner').classList.remove('hidden');
+            document.getElementById('validacao-ok').classList.add('hidden');
+            
+            setTimeout(() => {
+                document.getElementById('validacao-spinner').classList.add('hidden');
+                document.getElementById('validacao-ok').classList.remove('hidden');
+                
+                const btn = document.getElementById('btn-submit');
+                btn.className = "w-full py-4 rounded-xl text-sm font-bold text-white transition-all duration-300 flex items-center justify-center space-x-2 mt-4 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 shadow-lg shadow-emerald-500/20";
+            }, 1500);
+        }
+    </script>
+
+    <!-- Previous Comprovações -->
+    {% if comprovacoes %}
+    <div class="mt-10">
+        <h2 class="text-lg font-bold text-white mb-4 flex items-center space-x-2">
+            <span>📋</span>
+            <span>Comprovações Anteriores</span>
+        </h2>
+        <div class="space-y-3">
+            {% for comp in comprovacoes %}
+            <div class="glass rounded-xl p-4">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-gray-300 break-words">{{ comp.descricao }}</p>
+                        {% if comp.link %}
+                        <a href="{{ comp.link }}" target="_blank" class="text-xs text-emerald-400 hover:underline mt-1 inline-block truncate max-w-full">🔗 {{ comp.link }}</a>
+                        {% endif %}
+                        <p class="text-xs text-gray-600 mt-1">{{ comp.data_envio|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    <span class="ml-3 flex-shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold
+                        {% if comp.aprovada == True %}bg-emerald-500/15 text-emerald-400
+                        {% elif comp.aprovada == False %}bg-red-500/15 text-red-400
+                        {% else %}bg-yellow-500/15 text-yellow-400{% endif %}">
+                        {% if comp.aprovada == True %}Aprovada ✅
+                        {% elif comp.aprovada == False %}Rejeitada ❌
+                        {% else %}Pendente ⏳{% endif %}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
